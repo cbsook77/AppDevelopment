@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.daily_function">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -7,7 +8,11 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 
     <application
@@ -17,12 +22,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PedoActivity"/>
+
+        <activity android:name=".BoardActivity"/>
+        <activity android:name=".AiExercise" />
+        <activity android:name=".DiseaseInfoActivity" />
+        <activity android:name=".AiRecomand" />
+        <activity android:name=".DetailPedometer" />
+        <activity android:name=".FoodInput"/>
         <activity android:name=".RegisterActivity"/>
         <activity android:name=".MainActivity"/>
         <activity android:name=".ProfileChangeActivity"/>
         <activity android:name=".ProfileInfoActivity"/>
         <activity android:name=".FindPassActivity"/>
+        <activity android:name=".BoardInsertActivity"/>
+        <activity android:name=".BoardDetailActivity"/>
+        <activity android:name=".Board_noticeActivity"/>
+        <activity android:name=".Board_mytitleActivity"/>
+        <activity android:name=".Board_popularActivity"/>
+        <activity android:name=".Board_totalActivity"/>
+
         <activity android:name=".LoginActivity">
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
@@ -39,7 +57,7 @@
             </intent-filter>
         </service>
         <receiver
-            android:name=".PedoActivity"
+            android:name=".MainActivity"
             android:enabled="true"
             android:exported="false"
             android:label="STARTReceiver">

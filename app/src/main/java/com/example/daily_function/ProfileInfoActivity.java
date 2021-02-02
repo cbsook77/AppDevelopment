@@ -42,6 +42,7 @@ public class ProfileInfoActivity extends AppCompatActivity implements View.OnCli
     private DatabaseReference pReference;
     private ChildEventListener pChild;
 
+
     private ListView pListview;
     Button change,cancel;
 
@@ -51,7 +52,6 @@ public class ProfileInfoActivity extends AppCompatActivity implements View.OnCli
         setContentView(R.layout.activity_profileinfo);
 
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("프로필정보");
         setSupportActionBar(toolbar);
 
         change =(Button)findViewById(R.id.btn_change);
@@ -182,9 +182,11 @@ public class ProfileInfoActivity extends AppCompatActivity implements View.OnCli
         if(v == change) {
             Intent change = new Intent(getApplicationContext(), ProfileChangeActivity.class);
             startActivity(change);
+            finish();
         }else if(v == cancel) {
             Intent main = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(main);
+            finish();
         }
     }
 }

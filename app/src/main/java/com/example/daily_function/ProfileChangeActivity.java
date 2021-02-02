@@ -4,7 +4,11 @@ import android.content.Intent;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
@@ -12,8 +16,9 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
-import com.google.cloud.dialogflow.v2.Agent;
+//import com.google.cloud.dialogflow.v2.Agent;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -31,6 +36,9 @@ public class ProfileChangeActivity extends AppCompatActivity { //프로필 변�
     Double Theight,Tweight;
     int Tage;
 
+    Toolbar toolbar;
+
+
     private RadioGroup rg;
 
     private FirebaseAuth firebaseAuth;
@@ -44,6 +52,9 @@ public class ProfileChangeActivity extends AppCompatActivity { //프로필 변�
         setContentView(R.layout.activity_profilechange);
 
         rg = (RadioGroup)findViewById(R.id.radioGroup1);
+
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         firebaseAuth = FirebaseAuth.getInstance();
         //유저가 로그인 하지 않은 상태라면 null 상태이고 이 액티비티를 종료하고 로그인 액티비티를 연다.
@@ -61,14 +72,14 @@ public class ProfileChangeActivity extends AppCompatActivity { //프로필 변�
         AGE = (EditText) findViewById(R.id.age);
         GENDER=(RadioButton)findViewById(rg.getCheckedRadioButtonId());
 
-        ImageButton change = (ImageButton) findViewById(R.id.change);
+        Button change = (Button) findViewById(R.id.change);
         change.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 Tname = NAME.getText().toString();
-                Theight = Double.parseDouble(WEIGHT.getText().toString());
-                Tweight = Double.parseDouble(HEIGHT.getText().toString());
+                Theight = Double.parseDouble(HEIGHT.getText().toString());
+                Tweight = Double.parseDouble(WEIGHT.getText().toString());
                 Tage =Integer.parseInt(AGE.getText().toString());
                 Tgender=GENDER.getText().toString();
 
@@ -104,7 +115,7 @@ public class ProfileChangeActivity extends AppCompatActivity { //프로필 변�
 
                 }
             } });
-        ImageButton cancel = (ImageButton) findViewById(R.id.cancel_button);
+        Button cancel = (Button) findViewById(R.id.cancel_button);
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,6 +124,32 @@ public class ProfileChangeActivity extends AppCompatActivity { //프로필 변�
                 finish();
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_toolbar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.profile:
+                Intent profile = new Intent(getApplicationContext(), ProfileChangeActivity.class);
+                startActivity(profile);
+                break;
+            case R.id.logout:
+                firebaseAuth.signOut();
+                finish();
+                Intent logout = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(logout);
+                Toast.makeText(this, "로그아웃 되었습니다!", Toast.LENGTH_SHORT).show();
+                break;
+        }
+
+        return true;
     }
 
 }

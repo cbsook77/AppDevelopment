@@ -12,9 +12,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
 
@@ -22,7 +22,7 @@ import androidx.core.app.NotificationCompat;
 public class StepCheckServices extends Service implements SensorEventListener {
     public StepCheckServices() {
     }
-    int count = com.example.daily_function.StepValue.Step;
+    int count = StepValue.Step;
     // 맴버변수 (마지막과 현재값을 비교하여 변위를 계산하는 방식
     private long lastTime;
     private float speed;
@@ -43,7 +43,7 @@ public class StepCheckServices extends Service implements SensorEventListener {
         Log.i("onCreate", "IN");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-           CHANNEL_ID = "my_channel_01";
+            CHANNEL_ID = "my_channel_01";
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
                     "Channel human readable title",
                     NotificationManager.IMPORTANCE_DEFAULT);
@@ -80,19 +80,19 @@ public class StepCheckServices extends Service implements SensorEventListener {
     public void onDestroy() {
         super.onDestroy();
         Log.i("onDestroy", "IN");
-      //  if (sensorManager != null) {
+        //  if (sensorManager != null) {
         //    sensorManager.unregisterListener(this);
-          //  StepValue.Step = 0;
-      //  }
+        //  StepValue.Step = 0;
+        //  }
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && sensorManager != null) {
             sensorManager.unregisterListener(this);
-            com.example.daily_function.StepValue.Step = 0;
+            StepValue.Step = 0;
         }
 
     }
-    
+
 
 
     // 센서에 변화를 감지하기 위해 계속 호출되고 있는 함수
@@ -118,21 +118,24 @@ public class StepCheckServices extends Service implements SensorEventListener {
                 // 임계값보다 크게 움직였을 경우 다음을 수행
                 if (speed > SHAKE_THRESHOLD) {
                     Log.i("onSensorChanged_IF", "SECOND_IF_IN");
-                    Intent myFilteredResponse = new Intent("com.example.daily_functions");
-                   // Intent myFilteredResponse2 = new Intent("com.example.daily_functions");
+                    Intent myFilteredResponse = new Intent("com.example.daily_function");
+                    // Intent myFilteredResponse2 = new Intent("com.example.daily_functions");
 
-                    com.example.daily_function.StepValue.Step = count++;
-                    NotificationSomethings();
+                    StepValue.Step = count++;
+                    Notification_info();
 
 
-                    String msg = com.example.daily_function.StepValue.Step / 2 + ""; //발걸음 메인액티비티 결과값 파싱
-                    String dist_msg = getDistanceRun(com.example.daily_function.StepValue.Step) + "km"; // 이동거리
-                    String kcal_msg = getCalorie(com.example.daily_function.StepValue.Step)+"kcal"; //칼로리
+                    String msg = StepValue.Step / 2 + ""; //발걸음 메인액티비티 결과값 파싱
+                    // String msg = StepValue.Step + ""; //발걸음 메인액티비티 결과값 파싱
+                    String dist_msg = getDistanceRun(StepValue.Step/2) + "km"; // 이동거리
+                    String kcal_msg = getCalorie(StepValue.Step)+"kcal"; //칼로리
+                    String prog_msg= StepValue.Step/2+"";
 
                     // 발걸음과, 이동거리 2개다 넣기
                     myFilteredResponse.putExtra("stepService", msg);
                     myFilteredResponse.putExtra("kcalService", kcal_msg);
                     myFilteredResponse.putExtra("distService", dist_msg);
+                    myFilteredResponse.putExtra("progService", prog_msg);
 
                     // 발걸음 브로드 캐스트
                     sendBroadcast(myFilteredResponse);
@@ -167,30 +170,30 @@ public class StepCheckServices extends Service implements SensorEventListener {
 
     //칼로리 계산 함수
     public int getCalorie(int steps){
-       // double weigt=62.4; //추후에 DB에서 사용자의 몸무게를 가져와야함. 일단 테스트용으로 내 몸무게로 ^^
+        // double weigt=62.4; //추후에 DB에서 사용자의 몸무게를 가져와야함. 일단 테스트용으로 내 몸무게로 ^^
         int cal = (int)Math.floor((steps/10000.0)*62.4*5.5); //62.4가 weight
-       // String str_kcal=Double.toString(cal);
+        // String str_kcal=Double.toString(cal);
         return (cal/2);
     }
 
-    public void NotificationSomethings() {
+    public void Notification_info() {
 
 
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
-        Intent notificationIntent = new Intent(this, com.example.daily_function.MainActivity.class);
+        Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.putExtra("notificationId", count); //전달할 값
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK) ;
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent,  PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground)) //BitMap 이미지 요구
-                .setContentTitle("오늘의 걸음: "+ com.example.daily_function.StepValue.Step)
+                .setContentTitle("오늘의 걸음: "+StepValue.Step/2)
                 .setContentText("10000걸음까지 파이팅입니다!")
                 // 더 많은 내용이라서 일부만 보여줘야 하는 경우 아래 주석을 제거하면 setContentText에 있는 문자열 대신 아래 문자열을 보여줌
                 //.setStyle(new NotificationCompat.BigTextStyle().bigText("더 많은 내용을 보여줘야 하는 경우..."))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent) // 사용자가 노티피케이션을 탭시 ResultActivity로 이동하도록 설정
+                .setContentIntent(pendingIntent) // 사용자가 노티피케이션을 탭시 메인액티비로 이동하도록 설정
                 .setAutoCancel(true);
 
         //OREO API 26 이상에서는 채널 필요

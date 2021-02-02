@@ -58,12 +58,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
         }
 
-        emailText = (EditText) findViewById(R.id.email);
-        passText = (EditText) findViewById(R.id.pass);
-        buttonlogin =(Button)findViewById(R.id.buttonlogin);
-        register=(TextView)findViewById(R.id.register);
-        findpass=(TextView)findViewById(R.id.findpass);
-
+        emailText = (EditText) findViewById(R.id.email); //이메일입력
+        passText = (EditText) findViewById(R.id.pass); //비밀번호입력
+        buttonlogin =(Button)findViewById(R.id.buttonlogin); //로그인버튼
+        register=(TextView)findViewById(R.id.register); //회원가입
+        findpass=(TextView)findViewById(R.id.findpass); //비번찾기
+        textviewMessage = (TextView) findViewById(R.id.textviewMessage); //오류메시지 출력
         progressDialog = new ProgressDialog(this);
 
         buttonlogin.setOnClickListener(this);
@@ -100,6 +100,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         } else {
                             Toast.makeText(getApplicationContext(), "로그인 실패!!", Toast.LENGTH_LONG).show();
                             textviewMessage.setText("로그인 실패 유형\n - Email와 papssword를 확인해주세요!!\n ");
+
                         }
                     }
                 });

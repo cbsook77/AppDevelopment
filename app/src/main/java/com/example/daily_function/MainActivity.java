@@ -1,37 +1,63 @@
 package com.example.daily_function;
 
-import android.content.Intent;
-import android.os.Bundle;
-import androidx.appcompat.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.os.Build;
+
+import java.util.Calendar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity{
 
-    Toolbar toolbar;
+    Intent pedometerService;
+    BroadcastReceiver receiver;
     private FirebaseAuth firebaseAuth;
-    Button pedobtn; //만보기 버튼
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    boolean flag = true;
+    String serviceData; //발 걸음
+    String serviceData4;// 발걸음을 프로그래스 바로 나타내기 위한 변수
+
+    TextView countText;
+    Button FoodBtn;
+    Button AiRecoBtn; //Ai 식단 추천
+    Button DisBtn; // 질병 정보
+    Button AiExecBtn; // Ai 운동
+    Button BoardBtn; //게시판
+    Button ProfileBtn; //프로필
+
+    ProgressBar step_progressBar; //프로그래스 바
+    int progress;
+
+    //Calendar today = Calendar.getInstance ( );
+    Calendar today = Calendar.getInstance( );
+
+
+
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        pedometerService = new Intent(this, StepCheckServices.class);
+        receiver = new PlayingReceiver();
 
-        pedobtn =(Button)findViewById(R.id.pedobutton);
-        pedobtn.setOnClickListener(this);
+        countText = (TextView) findViewById(R.id.stepText);
+        step_progressBar = (ProgressBar) findViewById(R.id.progressBar1);
+        step_progressBar.setMax(10000);
+        progress =0;
 
         //initializing firebase authentication object
         firebaseAuth = FirebaseAuth.getInstance();
@@ -43,40 +69,199 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //유저가 있다면, null이 아니면 계속 진행
         FirebaseUser user = firebaseAuth.getCurrentUser();
+
+        // playingBtn = (Button) findViewById(R.id.btnStopService);
+        /*
+        playingBtn.setOnClickListener(new View.OnClickListener() {
+
+           @Override
+            public void onClick(View v) {
+
+                if (flag) {
+                    // TODO Auto-generated method stub
+                    try {
+                IntentFilter mainFilter = new IntentFilter("com.example.daily_functions");
+                registerReceiver(receiver, mainFilter);
+                //startService(pedometerService);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(pedometerService);
+                }else {
+                    startService(pedometerService);
+                }
+
+            } catch (Exception e) {
+                // TODO: handle exception
+                Toast.makeText(getApplicationContext(), e.getMessage(),
+                        Toast.LENGTH_LONG).show();
+            }
+                } else {
+
+                    playingBtn.setText("Go !!");
+
+                    // TODO Auto-generated method stub
+                    try {
+
+                        unregisterReceiver(receiver);
+
+                        stopService(manboService);
+
+                        // txtMsg.setText("After stoping Service:\n"+service.getClassName());
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                        Toast.makeText(getApplicationContext(), e.getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                flag = !flag;
+
+            }
+        });
+        */
+
+        //if (flag) {
+        try {
+            IntentFilter mainFilter = new IntentFilter("com.example.daily_function");
+            registerReceiver(receiver, mainFilter);
+            //startService(pedometerService);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(pedometerService);
+            }else {
+                startService(pedometerService);
+            }
+
+        } catch (Exception e) {
+            // TODO: handle exception
+            Toast.makeText(getApplicationContext(), e.getMessage(),
+                    Toast.LENGTH_LONG).show();
+        }
+        //   }
+        /* 여기는 이제 다음날 바꿀경우 0으로 초기화하는 구간
+        else {
+
+
+            // TODO Auto-generated method stub
+            try {
+
+                unregisterReceiver(receiver);
+
+                stopService(pedometerService);
+
+                // txtMsg.setText("After stoping Service:\n"+service.getClassName());
+            } catch (Exception e) {
+                // TODO: handle exception
+                Toast.makeText(getApplicationContext(), e.getMessage(),
+                        Toast.LENGTH_LONG).show();
+            }
+
+
+        }
+        */
+        //   flag = !flag;
+
+        ProfileBtn=(Button)findViewById(R.id.ProfileMv);
+        ProfileBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Intent intent = new Intent(getApplicationContext(), ProfileInfoActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        //원형 레이아웃 클릭시 상세정보 액티비티 이동
+        ViewGroup layout = (ViewGroup) findViewById(R.id.re2);
+        layout.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Intent intent = new Intent(v.getContext(), DetailPedometer.class);
+                startActivity(intent);
+            }
+        });
+
+
+        // 음식 입력 액티비티 이동
+        FoodBtn= (Button) findViewById(R.id.input_food);
+        FoodBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Intent intent = new Intent(getApplicationContext(), FoodInput.class);
+                startActivity(intent);
+            }
+        });
+
+        AiRecoBtn=(Button)findViewById(R.id.AiFoodMv);
+        AiRecoBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Intent intent = new Intent(getApplicationContext(), AiRecomand.class);
+                startActivity(intent);
+            }
+        });
+
+        DisBtn=(Button)findViewById(R.id.DiseaseMv);
+        DisBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Intent intent = new Intent(getApplicationContext(), DiseaseInfoActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        AiExecBtn=(Button)findViewById(R.id.AiExecMv);
+        AiExecBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Intent intent = new Intent(getApplicationContext(), AiExercise.class);
+                startActivity(intent);
+            }
+        });
+
+        BoardBtn=(Button)findViewById(R.id.BoardMv);
+        BoardBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Intent intent = new Intent(getApplicationContext(), BoardActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+
+
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu_toolbar, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.profile:
-                Intent profile = new Intent(getApplicationContext(), ProfileInfoActivity.class);
-                startActivity(profile);
-                break;
+    // 하루 지나면 발걸음수를 디비에 저장하고 0으로 초기화 추가해야함
+    class PlayingReceiver extends BroadcastReceiver {
 
-            case R.id.logout:
-                firebaseAuth.signOut();
-                finish();
-                Intent logout = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(logout);
-                Toast.makeText(this, "로그아웃 되었습니다!", Toast.LENGTH_SHORT).show();
-                break;
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i("PlayignReceiver", "IN");
+            //발걸음수
+            serviceData = intent.getExtras().getString("stepService");
+            countText.setText(serviceData);
+
+            //프로그래스바
+            serviceData4=intent.getExtras().getString("progService");
+            progress=Integer.parseInt(serviceData4);
+            if (progress==10000) {
+                progress=0;
+                step_progressBar.setProgress(0);
+            }
+            else
+                step_progressBar.setProgress(progress);
+
         }
 
-        return true;
     }
 
-    @Override
-    public void onClick(View v) {
-        if(v == pedobtn) {
-            Intent pedo = new Intent(getApplicationContext(), PedoActivity.class);
-            startActivity(pedo);
-        }
-    }
 }
